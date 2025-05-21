@@ -1,76 +1,103 @@
 #include <stdio.h>
 
-#define TAMANHO_TABULEIRO 10
-#define TAMANHO_NAVIO 3
+#define TAM 10
 #define NAVIO 3
-#define AGUA 0
+#define OCUPADO 3
+#define LIVRE 0
 
 int main() {
-    // Declara o tabuleiro e inicializa todas as posições com 0 (água)
-    int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO];
-    for (int i = 0; i < TAMANHO_TABULEIRO; i++) {
-        for (int j = 0; j < TAMANHO_TABULEIRO; j++) {
-            tabuleiro[i][j] = AGUA;
+    int tabuleiro[TAM][TAM];
+    
+    // Inicializa o tabuleiro com 0 (água)
+    for (int i = 0; i < TAM; i++) {
+        for (int j = 0; j < TAM; j++) {
+            tabuleiro[i][j] = LIVRE;
         }
     }
-
-    // Define as coordenadas iniciais dos navios (pode alterar conforme necessário)
-    int linhaNavioHorizontal = 2;
-    int colunaNavioHorizontal = 4;
-
-    int linhaNavioVertical = 5;
-    int colunaNavioVertical = 6;
 
     int podeInserir = 1;
 
-    // Verifica se o navio horizontal cabe no tabuleiro
-    if (colunaNavioHorizontal + TAMANHO_NAVIO > TAMANHO_TABULEIRO) {
-        printf("Erro: Navio horizontal fora dos limites do tabuleiro.\n");
-        podeInserir = 0;
-    }
-
-    // Verifica se o navio vertical cabe no tabuleiro
-    if (linhaNavioVertical + TAMANHO_NAVIO > TAMANHO_TABULEIRO) {
-        printf("Erro: Navio vertical fora dos limites do tabuleiro.\n");
-        podeInserir = 0;
-    }
-
-    // Verifica se há sobreposição para o navio horizontal
-    for (int i = 0; i < TAMANHO_NAVIO && podeInserir; i++) {
-        if (tabuleiro[linhaNavioHorizontal][colunaNavioHorizontal + i] != AGUA) {
-            printf("Erro: Sobreposição detectada no navio horizontal.\n");
-            podeInserir = 0;
+    // --- Navio 1: Horizontal ---
+    int l1 = 1, c1 = 2; // coordenadas iniciais
+    if (c1 + NAVIO <= TAM) {
+        for (int i = 0; i < NAVIO; i++) {
+            if (tabuleiro[l1][c1 + i] != LIVRE) podeInserir = 0;
         }
-    }
-
-    // Verifica se há sobreposição para o navio vertical
-    for (int i = 0; i < TAMANHO_NAVIO && podeInserir; i++) {
-        if (tabuleiro[linhaNavioVertical + i][colunaNavioVertical] != AGUA) {
-            printf("Erro: Sobreposição detectada no navio vertical.\n");
-            podeInserir = 0;
-        }
-    }
-
-    // Se for possível, posiciona os navios
-    if (podeInserir) {
-        // Posiciona o navio horizontal
-        for (int i = 0; i < TAMANHO_NAVIO; i++) {
-            tabuleiro[linhaNavioHorizontal][colunaNavioHorizontal + i] = NAVIO;
-        }
-
-        // Posiciona o navio vertical
-        for (int i = 0; i < TAMANHO_NAVIO; i++) {
-            tabuleiro[linhaNavioVertical + i][colunaNavioVertical] = NAVIO;
-        }
-
-        // Exibe o tabuleiro no console
-        printf("Tabuleiro:\n");
-        for (int i = 0; i < TAMANHO_TABULEIRO; i++) {
-            for (int j = 0; j < TAMANHO_TABULEIRO; j++) {
-                printf("%d ", tabuleiro[i][j]);
+        if (podeInserir) {
+            for (int i = 0; i < NAVIO; i++) {
+                tabuleiro[l1][c1 + i] = OCUPADO;
             }
-            printf("\n");
+        } else {
+            printf("Erro: Sobreposição ou limite no navio horizontal 1.\n");
         }
+    } else {
+        printf("Erro: Navio horizontal 1 fora dos limites.\n");
+    }
+
+    podeInserir = 1;
+
+    // --- Navio 2: Vertical ---
+    int l2 = 5, c2 = 4;
+    if (l2 + NAVIO <= TAM) {
+        for (int i = 0; i < NAVIO; i++) {
+            if (tabuleiro[l2 + i][c2] != LIVRE) podeInserir = 0;
+        }
+        if (podeInserir) {
+            for (int i = 0; i < NAVIO; i++) {
+                tabuleiro[l2 + i][c2] = OCUPADO;
+            }
+        } else {
+            printf("Erro: Sobreposição ou limite no navio vertical 2.\n");
+        }
+    } else {
+        printf("Erro: Navio vertical 2 fora dos limites.\n");
+    }
+
+    podeInserir = 1;
+
+    // --- Navio 3: Diagonal ↘ (linha++, coluna++) ---
+    int l3 = 0, c3 = 0;
+    if (l3 + NAVIO <= TAM && c3 + NAVIO <= TAM) {
+        for (int i = 0; i < NAVIO; i++) {
+            if (tabuleiro[l3 + i][c3 + i] != LIVRE) podeInserir = 0;
+        }
+        if (podeInserir) {
+            for (int i = 0; i < NAVIO; i++) {
+                tabuleiro[l3 + i][c3 + i] = OCUPADO;
+            }
+        } else {
+            printf("Erro: Sobreposição ou limite no navio diagonal ↘ 3.\n");
+        }
+    } else {
+        printf("Erro: Navio diagonal ↘ 3 fora dos limites.\n");
+    }
+
+    podeInserir = 1;
+
+    // --- Navio 4: Diagonal ↙ (linha++, coluna--) ---
+    int l4 = 0, c4 = 9;
+    if (l4 + NAVIO <= TAM && c4 - NAVIO + 1 >= 0) {
+        for (int i = 0; i < NAVIO; i++) {
+            if (tabuleiro[l4 + i][c4 - i] != LIVRE) podeInserir = 0;
+        }
+        if (podeInserir) {
+            for (int i = 0; i < NAVIO; i++) {
+                tabuleiro[l4 + i][c4 - i] = OCUPADO;
+            }
+        } else {
+            printf("Erro: Sobreposição ou limite no navio diagonal ↙ 4.\n");
+        }
+    } else {
+        printf("Erro: Navio diagonal ↙ 4 fora dos limites.\n");
+    }
+
+    // --- Exibir o tabuleiro ---
+    printf("\nTabuleiro:\n");
+    for (int i = 0; i < TAM; i++) {
+        for (int j = 0; j < TAM; j++) {
+            printf("%d ", tabuleiro[i][j]);
+        }
+        printf("\n");
     }
 
     return 0;
