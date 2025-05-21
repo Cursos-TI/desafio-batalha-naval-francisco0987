@@ -1,101 +1,136 @@
 #include <stdio.h>
-
 #define TAM 10
 #define NAVIO 3
 #define OCUPADO 3
 #define LIVRE 0
+#define HABILIDADE 5
 
 int main() {
     int tabuleiro[TAM][TAM];
-    
-    // Inicializa o tabuleiro com 0 (água)
+
+    // Inicializa o tabuleiro com água (0)
     for (int i = 0; i < TAM; i++) {
         for (int j = 0; j < TAM; j++) {
             tabuleiro[i][j] = LIVRE;
         }
     }
 
-    int podeInserir = 1;
+    // --- Posiciona navios (como antes) ---
 
-    // --- Navio 1: Horizontal ---
-    int l1 = 1, c1 = 2; // coordenadas iniciais
-    if (c1 + NAVIO <= TAM) {
-        for (int i = 0; i < NAVIO; i++) {
-            if (tabuleiro[l1][c1 + i] != LIVRE) podeInserir = 0;
+    // Navio horizontal
+    int l1 = 1, c1 = 1;
+    for (int i = 0; i < NAVIO; i++) {
+        if (c1 + i < TAM) {
+            tabuleiro[l1][c1 + i] = OCUPADO;
         }
-        if (podeInserir) {
-            for (int i = 0; i < NAVIO; i++) {
-                tabuleiro[l1][c1 + i] = OCUPADO;
-            }
-        } else {
-            printf("Erro: Sobreposição ou limite no navio horizontal 1.\n");
-        }
-    } else {
-        printf("Erro: Navio horizontal 1 fora dos limites.\n");
     }
 
-    podeInserir = 1;
-
-    // --- Navio 2: Vertical ---
-    int l2 = 5, c2 = 4;
-    if (l2 + NAVIO <= TAM) {
-        for (int i = 0; i < NAVIO; i++) {
-            if (tabuleiro[l2 + i][c2] != LIVRE) podeInserir = 0;
+    // Navio vertical
+    int l2 = 4, c2 = 7;
+    for (int i = 0; i < NAVIO; i++) {
+        if (l2 + i < TAM) {
+            tabuleiro[l2 + i][c2] = OCUPADO;
         }
-        if (podeInserir) {
-            for (int i = 0; i < NAVIO; i++) {
-                tabuleiro[l2 + i][c2] = OCUPADO;
-            }
-        } else {
-            printf("Erro: Sobreposição ou limite no navio vertical 2.\n");
-        }
-    } else {
-        printf("Erro: Navio vertical 2 fora dos limites.\n");
     }
 
-    podeInserir = 1;
-
-    // --- Navio 3: Diagonal ↘ (linha++, coluna++) ---
+    // Navio diagonal ↘
     int l3 = 0, c3 = 0;
-    if (l3 + NAVIO <= TAM && c3 + NAVIO <= TAM) {
-        for (int i = 0; i < NAVIO; i++) {
-            if (tabuleiro[l3 + i][c3 + i] != LIVRE) podeInserir = 0;
+    for (int i = 0; i < NAVIO; i++) {
+        if (l3 + i < TAM && c3 + i < TAM) {
+            tabuleiro[l3 + i][c3 + i] = OCUPADO;
         }
-        if (podeInserir) {
-            for (int i = 0; i < NAVIO; i++) {
-                tabuleiro[l3 + i][c3 + i] = OCUPADO;
-            }
-        } else {
-            printf("Erro: Sobreposição ou limite no navio diagonal ↘ 3.\n");
-        }
-    } else {
-        printf("Erro: Navio diagonal ↘ 3 fora dos limites.\n");
     }
 
-    podeInserir = 1;
-
-    // --- Navio 4: Diagonal ↙ (linha++, coluna--) ---
+    // Navio diagonal ↙
     int l4 = 0, c4 = 9;
-    if (l4 + NAVIO <= TAM && c4 - NAVIO + 1 >= 0) {
-        for (int i = 0; i < NAVIO; i++) {
-            if (tabuleiro[l4 + i][c4 - i] != LIVRE) podeInserir = 0;
+    for (int i = 0; i < NAVIO; i++) {
+        if (l4 + i < TAM && c4 - i >= 0) {
+            tabuleiro[l4 + i][c4 - i] = OCUPADO;
         }
-        if (podeInserir) {
-            for (int i = 0; i < NAVIO; i++) {
-                tabuleiro[l4 + i][c4 - i] = OCUPADO;
-            }
-        } else {
-            printf("Erro: Sobreposição ou limite no navio diagonal ↙ 4.\n");
-        }
-    } else {
-        printf("Erro: Navio diagonal ↙ 4 fora dos limites.\n");
     }
 
-    // --- Exibir o tabuleiro ---
-    printf("\nTabuleiro:\n");
+    // --- Habilidade: CONE (matriz 5x5) ---
+    int cone[5][5];
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5; j++) {
+            if (j >= 2 - i && j <= 2 + i) {
+                cone[i][j] = 1; // dentro do cone
+            } else {
+                cone[i][j] = 0;
+            }
+        }
+    }
+
+    // Aplica cone no tabuleiro (origem no centro da matriz do cone)
+    int origemLinhaCone = 5, origemColunaCone = 2;
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5; j++) {
+            int li = origemLinhaCone + i - 2;
+            int co = origemColunaCone + j - 2;
+            if (li >= 0 && li < TAM && co >= 0 && co < TAM && cone[i][j] == 1 && tabuleiro[li][co] == LIVRE) {
+                tabuleiro[li][co] = HABILIDADE;
+            }
+        }
+    }
+
+    // --- Habilidade: CRUZ (matriz 5x5) ---
+    int cruz[5][5];
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5; j++) {
+            if (i == 2 || j == 2) {
+                cruz[i][j] = 1; // linhas central e coluna central
+            } else {
+                cruz[i][j] = 0;
+            }
+        }
+    }
+
+    // Aplica cruz no tabuleiro
+    int origemLinhaCruz = 2, origemColunaCruz = 5;
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5; j++) {
+            int li = origemLinhaCruz + i - 2;
+            int co = origemColunaCruz + j - 2;
+            if (li >= 0 && li < TAM && co >= 0 && co < TAM && cruz[i][j] == 1 && tabuleiro[li][co] == LIVRE) {
+                tabuleiro[li][co] = HABILIDADE;
+            }
+        }
+    }
+
+    // --- Habilidade: OCTAEDRO (losango) ---
+    int octaedro[5][5];
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5; j++) {
+            if (abs(i - 2) + abs(j - 2) <= 2) {
+                octaedro[i][j] = 1; // forma de losango
+            } else {
+                octaedro[i][j] = 0;
+            }
+        }
+    }
+
+    // Aplica octaedro no tabuleiro
+    int origemLinhaOct = 7, origemColunaOct = 5;
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5; j++) {
+            int li = origemLinhaOct + i - 2;
+            int co = origemColunaOct + j - 2;
+            if (li >= 0 && li < TAM && co >= 0 && co < TAM && octaedro[i][j] == 1 && tabuleiro[li][co] == LIVRE) {
+                tabuleiro[li][co] = HABILIDADE;
+            }
+        }
+    }
+
+    // --- Exibe o tabuleiro ---
+    printf("\nTabuleiro final:\n");
     for (int i = 0; i < TAM; i++) {
         for (int j = 0; j < TAM; j++) {
-            printf("%d ", tabuleiro[i][j]);
+            if (tabuleiro[i][j] == LIVRE)
+                printf("0 ");
+            else if (tabuleiro[i][j] == OCUPADO)
+                printf("3 ");
+            else if (tabuleiro[i][j] == HABILIDADE)
+                printf("5 ");
         }
         printf("\n");
     }
