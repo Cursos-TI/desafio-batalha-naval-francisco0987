@@ -1,40 +1,77 @@
 #include <stdio.h>
 
-// Desafio Batalha Naval - MateCheck
-// Este código inicial serve como base para o desenvolvimento do sistema de Batalha Naval.
-// Siga os comentários para implementar cada parte do desafio.
+#define TAMANHO_TABULEIRO 10
+#define TAMANHO_NAVIO 3
+#define NAVIO 3
+#define AGUA 0
 
 int main() {
-    // Nível Novato - Posicionamento dos Navios
-    // Sugestão: Declare uma matriz bidimensional para representar o tabuleiro (Ex: int tabuleiro[5][5];).
-    // Sugestão: Posicione dois navios no tabuleiro, um verticalmente e outro horizontalmente.
-    // Sugestão: Utilize `printf` para exibir as coordenadas de cada parte dos navios.
+    // Declara o tabuleiro e inicializa todas as posições com 0 (água)
+    int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO];
+    for (int i = 0; i < TAMANHO_TABULEIRO; i++) {
+        for (int j = 0; j < TAMANHO_TABULEIRO; j++) {
+            tabuleiro[i][j] = AGUA;
+        }
+    }
 
-    // Nível Aventureiro - Expansão do Tabuleiro e Posicionamento Diagonal
-    // Sugestão: Expanda o tabuleiro para uma matriz 10x10.
-    // Sugestão: Posicione quatro navios no tabuleiro, incluindo dois na diagonal.
-    // Sugestão: Exiba o tabuleiro completo no console, mostrando 0 para posições vazias e 3 para posições ocupadas.
+    // Define as coordenadas iniciais dos navios (pode alterar conforme necessário)
+    int linhaNavioHorizontal = 2;
+    int colunaNavioHorizontal = 4;
 
-    // Nível Mestre - Habilidades Especiais com Matrizes
-    // Sugestão: Crie matrizes para representar habilidades especiais como cone, cruz, e octaedro.
-    // Sugestão: Utilize estruturas de repetição aninhadas para preencher as áreas afetadas por essas habilidades no tabuleiro.
-    // Sugestão: Exiba o tabuleiro com as áreas afetadas, utilizando 0 para áreas não afetadas e 1 para áreas atingidas.
+    int linhaNavioVertical = 5;
+    int colunaNavioVertical = 6;
 
-    // Exemplos de exibição das habilidades:
-    // Exemplo para habilidade em cone:
-    // 0 0 1 0 0
-    // 0 1 1 1 0
-    // 1 1 1 1 1
-    
-    // Exemplo para habilidade em octaedro:
-    // 0 0 1 0 0
-    // 0 1 1 1 0
-    // 0 0 1 0 0
+    int podeInserir = 1;
 
-    // Exemplo para habilidade em cruz:
-    // 0 0 1 0 0
-    // 1 1 1 1 1
-    // 0 0 1 0 0
+    // Verifica se o navio horizontal cabe no tabuleiro
+    if (colunaNavioHorizontal + TAMANHO_NAVIO > TAMANHO_TABULEIRO) {
+        printf("Erro: Navio horizontal fora dos limites do tabuleiro.\n");
+        podeInserir = 0;
+    }
+
+    // Verifica se o navio vertical cabe no tabuleiro
+    if (linhaNavioVertical + TAMANHO_NAVIO > TAMANHO_TABULEIRO) {
+        printf("Erro: Navio vertical fora dos limites do tabuleiro.\n");
+        podeInserir = 0;
+    }
+
+    // Verifica se há sobreposição para o navio horizontal
+    for (int i = 0; i < TAMANHO_NAVIO && podeInserir; i++) {
+        if (tabuleiro[linhaNavioHorizontal][colunaNavioHorizontal + i] != AGUA) {
+            printf("Erro: Sobreposição detectada no navio horizontal.\n");
+            podeInserir = 0;
+        }
+    }
+
+    // Verifica se há sobreposição para o navio vertical
+    for (int i = 0; i < TAMANHO_NAVIO && podeInserir; i++) {
+        if (tabuleiro[linhaNavioVertical + i][colunaNavioVertical] != AGUA) {
+            printf("Erro: Sobreposição detectada no navio vertical.\n");
+            podeInserir = 0;
+        }
+    }
+
+    // Se for possível, posiciona os navios
+    if (podeInserir) {
+        // Posiciona o navio horizontal
+        for (int i = 0; i < TAMANHO_NAVIO; i++) {
+            tabuleiro[linhaNavioHorizontal][colunaNavioHorizontal + i] = NAVIO;
+        }
+
+        // Posiciona o navio vertical
+        for (int i = 0; i < TAMANHO_NAVIO; i++) {
+            tabuleiro[linhaNavioVertical + i][colunaNavioVertical] = NAVIO;
+        }
+
+        // Exibe o tabuleiro no console
+        printf("Tabuleiro:\n");
+        for (int i = 0; i < TAMANHO_TABULEIRO; i++) {
+            for (int j = 0; j < TAMANHO_TABULEIRO; j++) {
+                printf("%d ", tabuleiro[i][j]);
+            }
+            printf("\n");
+        }
+    }
 
     return 0;
 }
